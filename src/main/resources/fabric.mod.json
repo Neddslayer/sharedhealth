@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "id": "sharedhealth",
   "version": "${version}",
-  "name": "sharedhealth",
-  "description": "",
-  "authors": [],
+  "name": "Shared Health",
+  "description": "A simple and lightweight mod that makes players share a collective health and/or hunger value",
+  "authors": ["Neddslayer"],
   "contact": {
-    "repo": "https://github.com/nedds/sharedhealth"
+    "repo": "https://github.com/neddslayer/sharedhealth"
   },
   "license": "GPL-3.0",
-  "icon": "assets/sharedhealth/icon.png",
+  "icon": "assets/sharedhealth/textures/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -32,7 +32,8 @@
   },
   "custom": {
     "cardinal-components": [
-      "sharedhealth:health"
+      "sharedhealth:health",
+      "sharedhealth:hunger"
     ]
   }
 }

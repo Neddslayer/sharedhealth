@@ -11,8 +11,12 @@ public class SharedHealthComponentInitializer implements ScoreboardComponentInit
     public static final ComponentKey<SharedHealthComponent> SHARED_HEALTH =
             ComponentRegistry.getOrCreate(new Identifier("sharedhealth", "health"), SharedHealthComponent.class);
 
+    public static final ComponentKey<SharedHungerComponent> SHARED_HUNGER =
+            ComponentRegistry.getOrCreate(new Identifier("sharedhealth", "hunger"), SharedHungerComponent.class);
+
     @Override
     public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
         registry.registerScoreboardComponent(SHARED_HEALTH, SharedHealthComponent::new);
+        registry.registerScoreboardComponent(SHARED_HUNGER, SharedHungerComponent::new);
     }
 }

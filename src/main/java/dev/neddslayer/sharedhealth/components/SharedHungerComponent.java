@@ -4,35 +4,35 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
 
-public class SharedHealthComponent implements IHealthComponent {
+public class SharedHungerComponent implements IHungerComponent {
 
-    float health = 20;
-
+    int hunger = 20;
     Scoreboard scoreboard;
     MinecraftServer server;
 
-    public SharedHealthComponent(Scoreboard scoreboard, MinecraftServer server) {
+    public SharedHungerComponent(Scoreboard scoreboard, MinecraftServer server) {
         this.scoreboard = scoreboard;
         this.server = server;
     }
 
+
     @Override
-    public float getHealth() {
-        return this.health;
+    public int getHunger() {
+        return this.hunger;
     }
 
     @Override
-    public void setHealth(float health) {
-        this.health = health ;
+    public void setHunger(int hunger) {
+        this.hunger = hunger;
     }
 
     @Override
     public void readFromNbt(NbtCompound tag) {
-        this.health = tag.getFloat("playerHealth");
+        this.hunger = tag.getInt("Hunger");
     }
 
     @Override
     public void writeToNbt(NbtCompound tag) {
-        tag.putFloat("playerHealth", this.health);
+        tag.putInt("Hunger", this.hunger);
     }
 }
