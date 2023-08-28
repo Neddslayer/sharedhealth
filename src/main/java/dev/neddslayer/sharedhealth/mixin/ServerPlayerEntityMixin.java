@@ -43,7 +43,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void killEveryoneOnDeath(DamageSource damageSource, CallbackInfo ci) {
-        System.out.println("whuh?");
         this.getServerWorld().getPlayers().forEach(player -> player.damage(damageSource, Float.MAX_VALUE));
         SHARED_HEALTH.get(this.getScoreboard()).setHealth(20.0f);
         SHARED_HUNGER.get(this.getScoreboard()).setHunger(20);
