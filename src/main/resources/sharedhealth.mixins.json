@@ -7,9 +7,11 @@
     "HungerManagerMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
+    "SaturationStatusEffectMixin",
     "ServerPlayerEntityMixin"
   ],
   "client": [
+    "InGameHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1

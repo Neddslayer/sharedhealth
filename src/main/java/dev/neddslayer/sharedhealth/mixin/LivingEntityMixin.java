@@ -4,7 +4,6 @@ import dev.neddslayer.sharedhealth.components.SharedHealthComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static dev.neddslayer.sharedhealth.components.SharedHealthComponentInitializer.SHARED_HEALTH;
+import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.SHARED_HEALTH;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {

@@ -1,7 +1,9 @@
 package dev.neddslayer.sharedhealth;
 
+import dev.neddslayer.sharedhealth.components.SharedExhaustionComponent;
 import dev.neddslayer.sharedhealth.components.SharedHealthComponent;
 import dev.neddslayer.sharedhealth.components.SharedHungerComponent;
+import dev.neddslayer.sharedhealth.components.SharedSaturationComponent;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -12,8 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameRules;
 
-import static dev.neddslayer.sharedhealth.components.SharedHealthComponentInitializer.SHARED_HEALTH;
-import static dev.neddslayer.sharedhealth.components.SharedHealthComponentInitializer.SHARED_HUNGER;
+import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.*;
 
 public class SharedHealth implements ModInitializer {
 
@@ -57,26 +58,39 @@ public class SharedHealth implements ModInitializer {
                         float currentHealth = playerEntity.getHealth();
 
                         if (currentHealth > finalKnownHealth) {
-                            playerEntity.damage(world.getDamageSources().generic(), currentHealth - finalKnownHealth);
+                            playerEntity.damage(world.getDamageSources().genericKill(), currentHealth - finalKnownHealth);
                         } else if (currentHealth < finalKnownHealth) {
                             playerEntity.heal(finalKnownHealth - currentHealth);
                         }
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        System.err.println(e.getMessage());
                     }
                 });
             }
             if (world.getGameRules().getBoolean(SYNC_HUNGER)) {
                 SharedHungerComponent component = SHARED_HUNGER.get(world.getScoreboard());
+	            SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(world.getScoreboard());
+	            SharedExhaustionComponent exhaustionComponent = SHARED_EXHAUSTION.get(world.getScoreboard());
                 if (component.getHunger() > 20) component.setHunger(20);
+				if (saturationComponent.getSaturation() > 20) saturationComponent.setSaturation(20.0f);
                 int finalKnownHunger = component.getHunger();
+				float finalKnownSaturation = saturationComponent.getSaturation();
+				float finalKnownExhaustion = exhaustionComponent.getExhaustion();
                 world.getPlayers().forEach(playerEntity -> {
                     try {
                         float currentHunger = playerEntity.getHungerManager().getFoodLevel();
+						float currentSaturation = playerEntity.getHungerManager().getSaturationLevel();
+						float currentExhaustion = playerEntity.getHungerManager().getExhaustion();
 
                         if (currentHunger != finalKnownHunger) {
                             playerEntity.getHungerManager().setFoodLevel(finalKnownHunger);
                         }
+						if (currentSaturation != finalKnownSaturation) {
+							playerEntity.getHungerManager().setSaturationLevel(finalKnownSaturation);
+						}
+						if (currentExhaustion != finalKnownExhaustion) {
+							playerEntity.getHungerManager().setExhaustion(finalKnownExhaustion);
+						}
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }

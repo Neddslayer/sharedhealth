@@ -12,14 +12,11 @@
   "icon": "assets/sharedhealth/textures/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "dev.neddslayer.sharedhealth.client.SharedHealthClient"
-    ],
     "main": [
       "dev.neddslayer.sharedhealth.SharedHealth"
     ],
     "cardinal-components": [
-      "dev.neddslayer.sharedhealth.components.SharedHealthComponentInitializer"
+      "dev.neddslayer.sharedhealth.components.SharedComponentsInitializer"
     ]
   },
   "mixins": [
@@ -33,7 +30,9 @@
   "custom": {
     "cardinal-components": [
       "sharedhealth:health",
-      "sharedhealth:hunger"
+      "sharedhealth:hunger",
+      "sharedhealth:saturation",
+      "sharedhealth:exhaustion"
     ]
   }
 }
