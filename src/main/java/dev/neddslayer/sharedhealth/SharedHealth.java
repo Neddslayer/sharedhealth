@@ -58,7 +58,8 @@ public class SharedHealth implements ModInitializer {
                         float currentHealth = playerEntity.getHealth();
 
                         if (currentHealth > finalKnownHealth) {
-                            playerEntity.damage(world.getDamageSources().genericKill(), currentHealth - finalKnownHealth);
+							// can't do anything else; that's the only unblockable damage type
+                            playerEntity.damage(world.getDamageSources().outOfWorld(), currentHealth - finalKnownHealth);
                         } else if (currentHealth < finalKnownHealth) {
                             playerEntity.heal(finalKnownHealth - currentHealth);
                         }
