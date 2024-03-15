@@ -1,8 +1,8 @@
 package dev.neddslayer.sharedhealth.components;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.Component;
 
-public interface ISaturationComponent extends ComponentV3 {
+public interface ISaturationComponent extends Component {
 	float getSaturation();
 	void setSaturation(float saturation);
 }

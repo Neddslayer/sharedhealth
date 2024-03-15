@@ -2,18 +2,15 @@ package dev.neddslayer.sharedhealth.components;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.server.MinecraftServer;
 
 public class SharedHealthComponent implements IHealthComponent {
 
     float health = 20;
 
     Scoreboard scoreboard;
-    MinecraftServer server;
 
-    public SharedHealthComponent(Scoreboard scoreboard, MinecraftServer server) {
+    public SharedHealthComponent(Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
-        this.server = server;
     }
 
     @Override

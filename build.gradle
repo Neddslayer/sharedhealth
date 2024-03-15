@@ -18,6 +18,10 @@ repositories {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/sharedhealth.accesswidener")
+}
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -27,12 +31,12 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cc_version}"
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cc_version}"
     // Adds a dependency on a specific module
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cc_version}"
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-scoreboard:${project.cc_version}"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cc_version}"
-    include "dev.onyxstudios.cardinal-components-api:cardinal-components-scoreboard:${project.cc_version}"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cc_version}"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-scoreboard:${project.cc_version}"
 }
 
 processResources {

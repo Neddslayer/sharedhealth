@@ -34,5 +34,6 @@
       "sharedhealth:saturation",
       "sharedhealth:exhaustion"
     ]
-  }
+  },
+  "accessWidener": "sharedhealth.accesswidener"
 }

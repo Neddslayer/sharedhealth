@@ -10,7 +10,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.text.Text;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameRules;
 
@@ -34,19 +35,19 @@ public class SharedHealth implements ModInitializer {
             boolean currentHealthValue = world.getGameRules().getBoolean(SYNC_HEALTH);
             boolean currentHungerValue = world.getGameRules().getBoolean(SYNC_HUNGER);
             if (currentHealthValue != lastHealthValue && currentHealthValue) {
-                world.getPlayers().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHealth.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
+                world.getPlayers().forEach(player -> player.sendMessage(new TranslatableText("gamerule.shareHealth.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
                 lastHealthValue = true;
             }
             else if (currentHealthValue != lastHealthValue) {
-                world.getPlayers().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHealth.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
+                world.getPlayers().forEach(player -> player.sendMessage(new TranslatableText("gamerule.shareHealth.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
                 lastHealthValue = false;
             }
             if (currentHungerValue != lastHungerValue && currentHungerValue) {
-                world.getPlayers().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHunger.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
+                world.getPlayers().forEach(player -> player.sendMessage(new TranslatableText("gamerule.shareHunger.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
                 lastHungerValue = true;
             }
             else if (currentHungerValue != lastHungerValue) {
-                world.getPlayers().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHunger.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
+                world.getPlayers().forEach(player -> player.sendMessage(new TranslatableText("gamerule.shareHunger.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
                 lastHungerValue = false;
             }
             if (world.getGameRules().getBoolean(SYNC_HEALTH)) {
@@ -59,7 +60,7 @@ public class SharedHealth implements ModInitializer {
 
                         if (currentHealth > finalKnownHealth) {
 							// can't do anything else; that's the only unblockable damage type
-                            playerEntity.damage(world.getDamageSources().outOfWorld(), currentHealth - finalKnownHealth);
+                            playerEntity.damage(DamageSource.OUT_OF_WORLD, currentHealth - finalKnownHealth);
                         } else if (currentHealth < finalKnownHealth) {
                             playerEntity.heal(finalKnownHealth - currentHealth);
                         }
@@ -81,7 +82,7 @@ public class SharedHealth implements ModInitializer {
                     try {
                         float currentHunger = playerEntity.getHungerManager().getFoodLevel();
 						float currentSaturation = playerEntity.getHungerManager().getSaturationLevel();
-						float currentExhaustion = playerEntity.getHungerManager().getExhaustion();
+						float currentExhaustion = playerEntity.getHungerManager().exhaustion;
 
                         if (currentHunger != finalKnownHunger) {
                             playerEntity.getHungerManager().setFoodLevel(finalKnownHunger);
@@ -90,7 +91,7 @@ public class SharedHealth implements ModInitializer {
 							playerEntity.getHungerManager().setSaturationLevel(finalKnownSaturation);
 						}
 						if (currentExhaustion != finalKnownExhaustion) {
-							playerEntity.getHungerManager().setExhaustion(finalKnownExhaustion);
+							playerEntity.getHungerManager().exhaustion = finalKnownExhaustion;
 						}
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
@@ -99,8 +100,8 @@ public class SharedHealth implements ModInitializer {
             }
         }));
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> handler.player.setHealth(SHARED_HEALTH.get(handler.player.getWorld().getScoreboard()).getHealth()));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> handler.player.setHealth(SHARED_HEALTH.get(handler.player.getServerWorld().getScoreboard()).getHealth()));
 
-        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> newPlayer.setHealth(SHARED_HEALTH.get(newPlayer.getWorld().getScoreboard()).getHealth()));
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> newPlayer.setHealth(SHARED_HEALTH.get(newPlayer.getServerWorld().getScoreboard()).getHealth()));
     }
 }

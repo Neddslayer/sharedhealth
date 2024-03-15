@@ -2,17 +2,14 @@ package dev.neddslayer.sharedhealth.components;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.server.MinecraftServer;
 
 public class SharedHungerComponent implements IHungerComponent {
 
     int hunger = 20;
     Scoreboard scoreboard;
-    MinecraftServer server;
 
-    public SharedHungerComponent(Scoreboard scoreboard, MinecraftServer server) {
+    public SharedHungerComponent(Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
-        this.server = server;
     }
 
 

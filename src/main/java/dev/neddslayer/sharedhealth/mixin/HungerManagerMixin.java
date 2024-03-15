@@ -20,16 +20,16 @@ public class HungerManagerMixin {
 
     @Shadow private int foodLevel;
 
-	@Shadow private float saturationLevel;
-
-	@Shadow private float exhaustion;
+	@Shadow public float exhaustion;
 
 	@Shadow private int foodTickTimer;
+
+	@Shadow private float foodSaturationLevel;
 
 	// hook into line 46
 	@Inject(method = "update", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/HungerManager;foodLevel:I", ordinal = 1, shift = At.Shift.BEFORE))
     public void decreaseHunger(PlayerEntity player, CallbackInfo ci) {
-        if (!player.getWorld().isClient) {
+        if (!player.getEntityWorld().isClient) {
             SharedHungerComponent component = SHARED_HUNGER.get(Objects.requireNonNull(player.getServer()).getScoreboard());
             int hunger = component.getHunger();
             if (this.foodLevel == hunger) {
@@ -39,13 +39,13 @@ public class HungerManagerMixin {
     }
 
 	// hook into line 44
-	@Inject(method = "update", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/HungerManager;saturationLevel:F", ordinal = 0, shift = At.Shift.BEFORE))
+	@Inject(method = "update", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/HungerManager;foodSaturationLevel:F", ordinal = 0, shift = At.Shift.BEFORE))
 	public void decreaseSaturation(PlayerEntity player, CallbackInfo ci) {
-		if (!player.getWorld().isClient) {
+		if (!player.getEntityWorld().isClient) {
 			SharedSaturationComponent component = SHARED_SATURATION.get(Objects.requireNonNull(player.getServer()).getScoreboard());
 			float saturation = component.getSaturation();
-			if (this.saturationLevel == saturation) {
-				component.setSaturation(Math.max(this.saturationLevel - 1.0f, 0.0f));
+			if (this.foodSaturationLevel == saturation) {
+				component.setSaturation(Math.max(this.foodSaturationLevel - 1.0f, 0.0f));
 			}
 		}
 	}
@@ -53,7 +53,7 @@ public class HungerManagerMixin {
 	// hook into line 42
 	@Inject(method = "update", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/HungerManager;exhaustion:F", ordinal = 1))
 	public void decreaseExhaustion(PlayerEntity player, CallbackInfo ci) {
-		if (!player.getWorld().isClient) {
+		if (!player.getEntityWorld().isClient) {
 			SharedExhaustionComponent component = SHARED_EXHAUSTION.get(Objects.requireNonNull(player.getServer()).getScoreboard());
 			float exhaustion = component.getExhaustion();
 			if (this.exhaustion == exhaustion) {
@@ -64,7 +64,7 @@ public class HungerManagerMixin {
 
 	@Inject(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/HungerManager;addExhaustion(F)V"))
 	public void hookAddExhaustion(PlayerEntity player, CallbackInfo ci) {
-		if (!player.getWorld().isClient) {
+		if (!player.getEntityWorld().isClient) {
 			SharedExhaustionComponent exhaustionComponent = SHARED_EXHAUSTION.get(Objects.requireNonNull(player.getServer()).getScoreboard());
 			SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(player.getServer()).getScoreboard());
 			float exhaustion = exhaustionComponent.getExhaustion();

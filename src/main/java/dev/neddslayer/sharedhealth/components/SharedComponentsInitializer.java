@@ -20,11 +20,12 @@ public class SharedComponentsInitializer implements ScoreboardComponentInitializ
 	public static final ComponentKey<SharedExhaustionComponent> SHARED_EXHAUSTION =
 			ComponentRegistry.getOrCreate(new Identifier("sharedhealth", "exhaustion"), SharedExhaustionComponent.class);
 
+	// pretty much all of this is marked with @ApiStatus.Experimental, but it's the core of my mod...
     @Override
     public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
-        registry.registerScoreboardComponent(SHARED_HEALTH, SharedHealthComponent::new);
-        registry.registerScoreboardComponent(SHARED_HUNGER, SharedHungerComponent::new);
-		registry.registerScoreboardComponent(SHARED_SATURATION, SharedSaturationComponent::new);
-		registry.registerScoreboardComponent(SHARED_EXHAUSTION, SharedExhaustionComponent::new);
+        registry.register(SHARED_HEALTH, SharedHealthComponent::new);
+        registry.register(SHARED_HUNGER, SharedHungerComponent::new);
+		registry.register(SHARED_SATURATION, SharedSaturationComponent::new);
+		registry.register(SHARED_EXHAUSTION, SharedExhaustionComponent::new);
     }
 }

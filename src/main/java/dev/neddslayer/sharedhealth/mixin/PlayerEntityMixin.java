@@ -27,7 +27,7 @@ import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer
 public abstract class PlayerEntityMixin extends LivingEntity {
     @Shadow public abstract HungerManager getHungerManager();
 
-	@Shadow @Final private PlayerAbilities abilities;
+	@Shadow @Final public PlayerAbilities abilities;
 
 	@Shadow protected HungerManager hungerManager;
 
@@ -55,10 +55,9 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	@Inject(method = "addExhaustion", at = @At("HEAD"))
 	public void syncExhaustion(float exhaustion, CallbackInfo ci) {
 		if (!this.abilities.invulnerable) {
-			if (!this.getWorld().isClient) {
+			if (!this.getEntityWorld().isClient) {
 				SharedExhaustionComponent component = SHARED_EXHAUSTION.get(Objects.requireNonNull(this.getServer()).getScoreboard());
-				if (this.hungerManager.getExhaustion() == component.getExhaustion()) {
-					System.out.println("Current is " + component.getExhaustion() + " new will be " + Math.min(component.getExhaustion() + exhaustion, 40.0F));
+				if (this.hungerManager.exhaustion == component.getExhaustion()) {
 					component.setExhaustion(Math.min(component.getExhaustion() + exhaustion, 40.0F));
 				}
 			}
