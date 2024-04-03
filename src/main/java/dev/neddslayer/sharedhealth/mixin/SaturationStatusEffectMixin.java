@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
 
-import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.SHARED_HUNGER;
-import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.SHARED_SATURATION;
+import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.*;
 
 @Mixin(StatusEffect.class)
 public abstract class SaturationStatusEffectMixin {

@@ -58,7 +58,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 			if (!this.getWorld().isClient) {
 				SharedExhaustionComponent component = SHARED_EXHAUSTION.get(Objects.requireNonNull(this.getServer()).getScoreboard());
 				if (this.hungerManager.getExhaustion() == component.getExhaustion()) {
-					System.out.println("Current is " + component.getExhaustion() + " new will be " + Math.min(component.getExhaustion() + exhaustion, 40.0F));
 					component.setExhaustion(Math.min(component.getExhaustion() + exhaustion, 40.0F));
 				}
 			}
