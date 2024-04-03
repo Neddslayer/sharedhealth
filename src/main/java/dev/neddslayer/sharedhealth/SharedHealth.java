@@ -22,6 +22,8 @@ public class SharedHealth implements ModInitializer {
             GameRuleRegistry.register("shareHealth", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
     public static final GameRules.Key<GameRules.BooleanRule> SYNC_HUNGER =
             GameRuleRegistry.register("shareHunger", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
+    public static final GameRules.Key<GameRules.BooleanRule> LIMIT_HEALTH =
+            GameRuleRegistry.register("limitHealth", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
     private static boolean lastHealthValue = true;
     private static boolean lastHungerValue = true;
 
@@ -33,6 +35,7 @@ public class SharedHealth implements ModInitializer {
         ServerTickEvents.END_WORLD_TICK.register((world -> {
             boolean currentHealthValue = world.getGameRules().getBoolean(SYNC_HEALTH);
             boolean currentHungerValue = world.getGameRules().getBoolean(SYNC_HUNGER);
+            boolean limitHealthValue = world.getGameRules().getBoolean(LIMIT_HEALTH);
             if (currentHealthValue != lastHealthValue && currentHealthValue) {
                 world.getPlayers().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHealth.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
                 lastHealthValue = true;
@@ -51,7 +54,7 @@ public class SharedHealth implements ModInitializer {
             }
             if (world.getGameRules().getBoolean(SYNC_HEALTH)) {
                 SharedHealthComponent component = SHARED_HEALTH.get(world.getScoreboard());
-                if (component.getHealth() > 20) component.setHealth(20);
+                if (component.getHealth() > 20 && limitHealthValue) component.setHealth(20);
                 float finalKnownHealth = component.getHealth();
                 world.getPlayers().forEach(playerEntity -> {
                     try {
