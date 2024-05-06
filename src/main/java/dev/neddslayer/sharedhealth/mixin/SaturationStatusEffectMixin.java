@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
 
@@ -21,7 +21,7 @@ public abstract class SaturationStatusEffectMixin {
 	@Shadow public abstract String getTranslationKey();
 
 	@Inject(method = "applyUpdateEffect", at = @At("HEAD"))
-	public void applyEffectToComponent(LivingEntity entity, int amplifier, CallbackInfo ci) {
+	public void applyEffectToComponent(LivingEntity entity, int amplifier, CallbackInfoReturnable<Boolean> cir) {
 		if (!entity.getWorld().isClient && entity instanceof PlayerEntity playerEntity && Objects.equals(this.getTranslationKey(), "effect.minecraft.saturation")) {
 			SharedHungerComponent hungerComponent = SHARED_HUNGER.get(Objects.requireNonNull(playerEntity.getServer()).getScoreboard());
 			SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(playerEntity.getServer()).getScoreboard());

@@ -1,6 +1,7 @@
 package dev.neddslayer.sharedhealth.components;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
 
@@ -24,12 +25,12 @@ public class SharedSaturationComponent implements ISaturationComponent {
 	}
 
 	@Override
-	public void readFromNbt(NbtCompound tag) {
+	public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
 		this.saturation = tag.getFloat("Saturation");
 	}
 
 	@Override
-	public void writeToNbt(NbtCompound tag) {
+	public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
 		tag.putFloat("Saturation", this.saturation);
 	}
 }

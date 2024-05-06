@@ -1,6 +1,7 @@
 package dev.neddslayer.sharedhealth.components;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
 
@@ -25,12 +26,12 @@ public class SharedExhaustionComponent implements IExhaustionComponent {
 	}
 
 	@Override
-	public void readFromNbt(NbtCompound tag) {
+	public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
 		this.exhaustion = tag.getFloat("Exhaustion");
 	}
 
 	@Override
-	public void writeToNbt(NbtCompound tag) {
+	public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
 		tag.putFloat("Exhaustion", this.exhaustion);
 	}
 }

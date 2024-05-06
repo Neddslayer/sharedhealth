@@ -3,12 +3,13 @@ package dev.neddslayer.sharedhealth.mixin;
 import dev.neddslayer.sharedhealth.components.SharedExhaustionComponent;
 import dev.neddslayer.sharedhealth.components.SharedHungerComponent;
 import dev.neddslayer.sharedhealth.components.SharedSaturationComponent;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.FoodComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
@@ -37,17 +38,17 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "eatFood", at = @At("HEAD"))
     public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (!world.isClient && stack.getItem().isFood()) {
-            FoodComponent foodComponent = stack.getItem().getFoodComponent();
+        if (!world.isClient && stack.getItem().getComponents().contains(DataComponentTypes.FOOD)) {
+            FoodComponent foodComponent = stack.getItem().getComponents().get(DataComponentTypes.FOOD);
             SharedHungerComponent hungerComponent = SHARED_HUNGER.get(Objects.requireNonNull(this.getServer()).getScoreboard());
 	        SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(this.getServer()).getScoreboard());
             int hunger = hungerComponent.getHunger();
 			float saturation = saturationComponent.getSaturation();
             if (this.getHungerManager().getFoodLevel() == hunger && foodComponent != null) {
-                hungerComponent.setHunger(Math.max(this.getHungerManager().getFoodLevel() + foodComponent.getHunger(), 0));
+                hungerComponent.setHunger(Math.max(this.getHungerManager().getFoodLevel() + foodComponent.nutrition(), 0));
             }
 			if (this.getHungerManager().getSaturationLevel() == saturation && foodComponent != null) {
-				saturationComponent.setSaturation(Math.min(saturation + (float)foodComponent.getHunger() * foodComponent.getSaturationModifier() * 2.0F, (float)hungerComponent.getHunger()));
+				saturationComponent.setSaturation(Math.min(saturation + (float)foodComponent.nutrition() * foodComponent.saturation() * 2.0F, (float)hungerComponent.getHunger()));
 			}
         }
     }
