@@ -26,32 +26,31 @@ import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
-    @Shadow public abstract HungerManager getHungerManager();
+	@Shadow public abstract HungerManager getHungerManager();
 
 	@Shadow @Final private PlayerAbilities abilities;
 
 	@Shadow protected HungerManager hungerManager;
 
 	protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
-        super(entityType, world);
-    }
+		super(entityType, world);
+	}
 
-    @Inject(method = "eatFood", at = @At("HEAD"))
-    public void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (!world.isClient && stack.getItem().getComponents().contains(DataComponentTypes.FOOD)) {
-            FoodComponent foodComponent = stack.getItem().getComponents().get(DataComponentTypes.FOOD);
-            SharedHungerComponent hungerComponent = SHARED_HUNGER.get(Objects.requireNonNull(this.getServer()).getScoreboard());
-	        SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(this.getServer()).getScoreboard());
-            int hunger = hungerComponent.getHunger();
+	@Inject(method = "eatFood", at = @At("HEAD"))
+	public void eatFood(World world, ItemStack stack, FoodComponent foodComponent, CallbackInfoReturnable<ItemStack> cir) {
+		if (!world.isClient && stack.getItem().getComponents().contains(DataComponentTypes.FOOD)) {
+			SharedHungerComponent hungerComponent = SHARED_HUNGER.get(Objects.requireNonNull(this.getServer()).getScoreboard());
+			SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(this.getServer()).getScoreboard());
+			int hunger = hungerComponent.getHunger();
 			float saturation = saturationComponent.getSaturation();
-            if (this.getHungerManager().getFoodLevel() == hunger && foodComponent != null) {
-                hungerComponent.setHunger(Math.max(this.getHungerManager().getFoodLevel() + foodComponent.nutrition(), 0));
-            }
+			if (this.getHungerManager().getFoodLevel() == hunger && foodComponent != null) {
+				hungerComponent.setHunger(Math.max(this.getHungerManager().getFoodLevel() + foodComponent.nutrition(), 0));
+			}
 			if (this.getHungerManager().getSaturationLevel() == saturation && foodComponent != null) {
 				saturationComponent.setSaturation(Math.min(saturation + (float)foodComponent.nutrition() * foodComponent.saturation() * 2.0F, (float)hungerComponent.getHunger()));
 			}
-        }
-    }
+		}
+	}
 
 	@Inject(method = "addExhaustion", at = @At("HEAD"))
 	public void syncExhaustion(float exhaustion, CallbackInfo ci) {
