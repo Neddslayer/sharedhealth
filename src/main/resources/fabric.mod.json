@@ -22,6 +22,7 @@
   "mixins": [
     "sharedhealth.mixins.json"
   ],
+  "accessWidener": "sharedhealth.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",

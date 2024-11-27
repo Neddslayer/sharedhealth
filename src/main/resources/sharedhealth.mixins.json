@@ -4,6 +4,7 @@
   "package": "dev.neddslayer.sharedhealth.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "FoodComponentMixin",
     "HungerManagerMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",

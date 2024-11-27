@@ -2,7 +2,6 @@ package dev.neddslayer.sharedhealth.mixin;
 
 import com.mojang.authlib.GameProfile;
 import dev.neddslayer.sharedhealth.components.SharedHealthComponent;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,9 +21,6 @@ import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Shadow
-    public abstract boolean damage(DamageSource source, float amount);
-
-    @Shadow
     public abstract ServerWorld getServerWorld();
 
 	public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
@@ -32,7 +28,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
     }
 
     @Inject(method = "damage", at = @At("RETURN"))
-    public void damageListener(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    public void damageListener(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
 		// ensure that damage is only taken if the damage listener is handled; you shouldn't be able to punch invulnerable players, etc.
 		if (cir.getReturnValue() && this.isAlive()) {
 			float currentHealth = this.getHealth();
@@ -46,7 +42,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "onDeath", at = @At("TAIL"))
     public void killEveryoneOnDeath(DamageSource damageSource, CallbackInfo ci) {
-        this.getServerWorld().getPlayers().forEach(LivingEntity::kill);
+        this.getServerWorld().getPlayers().forEach(p -> p.kill(this.getServerWorld()));
         SHARED_HEALTH.get(this.getScoreboard()).setHealth(20.0f);
         SHARED_HUNGER.get(this.getScoreboard()).setHunger(20);
 		SHARED_SATURATION.get(this.getScoreboard()).setSaturation(20.0f);

@@ -61,7 +61,7 @@ public class SharedHealth implements ModInitializer {
                         float currentHealth = playerEntity.getHealth();
 
                         if (currentHealth > finalKnownHealth) {
-                            playerEntity.damage(world.getDamageSources().genericKill(), currentHealth - finalKnownHealth);
+                            playerEntity.damage(world, world.getDamageSources().genericKill(), currentHealth - finalKnownHealth);
                         } else if (currentHealth < finalKnownHealth) {
                             playerEntity.heal(finalKnownHealth - currentHealth);
                         }
@@ -83,7 +83,7 @@ public class SharedHealth implements ModInitializer {
                     try {
                         float currentHunger = playerEntity.getHungerManager().getFoodLevel();
 						float currentSaturation = playerEntity.getHungerManager().getSaturationLevel();
-						float currentExhaustion = playerEntity.getHungerManager().getExhaustion();
+						float currentExhaustion = playerEntity.getHungerManager().exhaustion;
 
                         if (currentHunger != finalKnownHunger) {
                             playerEntity.getHungerManager().setFoodLevel(finalKnownHunger);
@@ -92,7 +92,7 @@ public class SharedHealth implements ModInitializer {
 							playerEntity.getHungerManager().setSaturationLevel(finalKnownSaturation);
 						}
 						if (currentExhaustion != finalKnownExhaustion) {
-							playerEntity.getHungerManager().setExhaustion(finalKnownExhaustion);
+							playerEntity.getHungerManager().exhaustion = finalKnownExhaustion;
 						}
                     } catch (Exception e) {
                         System.out.println(e.getMessage());

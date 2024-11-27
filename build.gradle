@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.8-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -50,6 +50,10 @@ processResources {
                 "minecraft_version": project.minecraft_version,
                 "loader_version": project.loader_version
     }
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/sharedhealth.accesswidener")
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -5,6 +5,7 @@ import dev.neddslayer.sharedhealth.components.SharedSaturationComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +22,7 @@ public abstract class SaturationStatusEffectMixin {
 	@Shadow public abstract String getTranslationKey();
 
 	@Inject(method = "applyUpdateEffect", at = @At("HEAD"))
-	public void applyEffectToComponent(LivingEntity entity, int amplifier, CallbackInfoReturnable<Boolean> cir) {
+	public void applyEffectToComponent(ServerWorld world, LivingEntity entity, int amplifier, CallbackInfoReturnable<Boolean> cir) {
 		if (!entity.getWorld().isClient && entity instanceof PlayerEntity playerEntity && Objects.equals(this.getTranslationKey(), "effect.minecraft.saturation")) {
 			SharedHungerComponent hungerComponent = SHARED_HUNGER.get(Objects.requireNonNull(playerEntity.getServer()).getScoreboard());
 			SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(playerEntity.getServer()).getScoreboard());
