@@ -27,7 +27,8 @@ public class SharedExhaustionComponent implements IExhaustionComponent {
 
 	@Override
 	public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		this.exhaustion = tag.getFloat("Exhaustion");
+		this.exhaustion = tag.getFloat("Exhaustion").orElse(0.0f);  // Default to 0.0f if not present
+
 	}
 
 	@Override

@@ -29,7 +29,7 @@ public class SharedHungerComponent implements IHungerComponent {
 
     @Override
     public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        this.hunger = tag.getInt("Hunger");
+       this.hunger = tag.getInt("Hunger").orElse(20);  // Default to 20 if not present
     }
 
     @Override
