@@ -37,7 +37,7 @@ public abstract class FoodComponentMixin {
                 hungerComponent.setHunger(Math.max(player.getHungerManager().getFoodLevel() + this.nutrition(), 0));
             }
             if (player.getHungerManager().getSaturationLevel() == saturation) {
-                saturationComponent.setSaturation(Math.min(saturation + (float)this.nutrition() * this.saturation() * 2.0F, (float)hungerComponent.getHunger()));
+                saturationComponent.setSaturation(Math.clamp(saturation + this.saturation(), 0.0f, (float)hungerComponent.getHunger()));
             }
         }
     }
