@@ -4,6 +4,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public class SharedExhaustionComponent implements IExhaustionComponent {
 	float exhaustion = 0.0f;
@@ -26,13 +28,12 @@ public class SharedExhaustionComponent implements IExhaustionComponent {
 	}
 
 	@Override
-	public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		this.exhaustion = tag.getFloat("Exhaustion").orElse(0.0f);  // Default to 0.0f if not present
-
+	public void readData(ReadView readView) {
+		this.exhaustion = readView.getFloat("Exhaustion", 0.0f);
 	}
 
 	@Override
-	public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		tag.putFloat("Exhaustion", this.exhaustion);
+	public void writeData(WriteView writeView) {
+		writeView.putFloat("Exhaustion", this.exhaustion);
 	}
 }

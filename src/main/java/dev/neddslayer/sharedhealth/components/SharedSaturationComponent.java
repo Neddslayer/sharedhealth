@@ -4,6 +4,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public class SharedSaturationComponent implements ISaturationComponent {
 	float saturation = 5.0f;
@@ -25,13 +27,12 @@ public class SharedSaturationComponent implements ISaturationComponent {
 	}
 
 	@Override
-	public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		this.saturation = tag.getFloat("Saturation").orElse(0.0f);  // Default to 0.0f if not present
-
+	public void readData(ReadView readView) {
+		this.saturation = readView.getFloat("Saturation", 0);
 	}
 
 	@Override
-	public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		tag.putFloat("Saturation", this.saturation);
+	public void writeData(WriteView writeView) {
+		writeView.putFloat("Saturation", this.saturation);
 	}
 }

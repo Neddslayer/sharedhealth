@@ -4,6 +4,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public class SharedHungerComponent implements IHungerComponent {
 
@@ -28,12 +30,12 @@ public class SharedHungerComponent implements IHungerComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-       this.hunger = tag.getInt("Hunger").orElse(20);  // Default to 20 if not present
+    public void readData(ReadView readView) {
+       this.hunger = readView.getInt("Hunger", 20);  // Default to 20 if not present
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.putInt("Hunger", this.hunger);
+    public void writeData(WriteView writeView) {
+        writeView.putInt("Hunger", this.hunger);
     }
 }

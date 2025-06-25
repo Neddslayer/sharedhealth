@@ -4,6 +4,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public class SharedHealthComponent implements IHealthComponent {
 
@@ -28,12 +30,12 @@ public class SharedHealthComponent implements IHealthComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        this.health = tag.getFloat("playerHealth").orElse(0.0f);  // Default to 0.0f if not present
+    public void readData(ReadView readView) {
+        this.health = readView.getFloat("playerHealth", 0.0f);  // Default to 0.0f if not present
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.putFloat("playerHealth", this.health);
+    public void writeData(WriteView writeView) {
+        writeView.putFloat("playerHealth", this.health);
     }
 }
