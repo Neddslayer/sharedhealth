@@ -6,7 +6,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,7 +18,7 @@ import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
-    @Shadow public abstract ServerWorld getWorld();
+    @Shadow public abstract ServerWorld getEntityWorld();
 
     public ServerPlayerEntityMixin(World world, GameProfile profile) {
         super(world, profile);
@@ -30,7 +29,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 		// ensure that damage is only taken if the damage listener is handled; you shouldn't be able to punch invulnerable players, etc.
 		if (cir.getReturnValue() && this.isAlive()) {
 			float currentHealth = this.getHealth();
-			SharedHealthComponent component = SHARED_HEALTH.get(this.getScoreboard());
+			SharedHealthComponent component = SHARED_HEALTH.get(this.getEntityWorld().getScoreboard());
 			float knownHealth = component.getHealth();
 			if (currentHealth != knownHealth) {
 				component.setHealth(currentHealth);
@@ -40,9 +39,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "onDeath", at = @At("TAIL"))
     public void killEveryoneOnDeath(DamageSource damageSource, CallbackInfo ci) {
-        this.getServer().getPlayerManager().getPlayerList().forEach(p -> p.kill(this.getWorld()));
-        SHARED_HEALTH.get(this.getScoreboard()).setHealth(20.0f);
-        SHARED_HUNGER.get(this.getScoreboard()).setHunger(20);
-		SHARED_SATURATION.get(this.getScoreboard()).setSaturation(20.0f);
+        this.getEntityWorld().getServer().getPlayerManager().getPlayerList().forEach(p -> p.kill(this.getEntityWorld()));
+        SHARED_HEALTH.get(this.getEntityWorld().getScoreboard()).setHealth(20.0f);
+        SHARED_HUNGER.get(this.getEntityWorld().getScoreboard()).setHunger(20);
+		SHARED_SATURATION.get(this.getEntityWorld().getScoreboard()).setSaturation(20.0f);
     }
 }

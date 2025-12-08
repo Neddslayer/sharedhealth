@@ -14,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Objects;
-
 import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.*;
 
 @Mixin(PlayerEntity.class)
@@ -32,8 +30,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	@Inject(method = "addExhaustion", at = @At("HEAD"))
 	public void syncExhaustion(float exhaustion, CallbackInfo ci) {
 		if (!this.abilities.invulnerable) {
-			if (!this.getWorld().isClient) {
-				SharedExhaustionComponent component = SHARED_EXHAUSTION.get(Objects.requireNonNull(this.getServer()).getScoreboard());
+			if (!this.getEntityWorld().isClient()) {
+				SharedExhaustionComponent component = SHARED_EXHAUSTION.get(this.getEntityWorld().getScoreboard());
 				if (this.hungerManager.exhaustion == component.getExhaustion()) {
 					component.setExhaustion(Math.min(component.getExhaustion() + exhaustion, 40.0F));
 				}

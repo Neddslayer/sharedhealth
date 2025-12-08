@@ -28,7 +28,7 @@ public abstract class FoodComponentMixin {
 
     @Inject(method = "onConsume", at = @At("HEAD"))
     public void eatFood(World world, LivingEntity user, ItemStack stack, ConsumableComponent consumable, CallbackInfo ci) {
-        if (user instanceof PlayerEntity player && !world.isClient) {
+        if (user instanceof PlayerEntity player && !world.isClient()) {
             SharedHungerComponent hungerComponent = SHARED_HUNGER.get(Objects.requireNonNull(world.getServer()).getScoreboard());
             SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(world.getServer()).getScoreboard());
             int hunger = hungerComponent.getHunger();

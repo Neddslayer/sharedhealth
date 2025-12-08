@@ -23,9 +23,9 @@ public abstract class SaturationStatusEffectMixin {
 
 	@Inject(method = "applyUpdateEffect", at = @At("HEAD"))
 	public void applyEffectToComponent(ServerWorld world, LivingEntity entity, int amplifier, CallbackInfoReturnable<Boolean> cir) {
-		if (!entity.getWorld().isClient && entity instanceof PlayerEntity playerEntity && Objects.equals(this.getTranslationKey(), "effect.minecraft.saturation")) {
-			SharedHungerComponent hungerComponent = SHARED_HUNGER.get(Objects.requireNonNull(playerEntity.getServer()).getScoreboard());
-			SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(Objects.requireNonNull(playerEntity.getServer()).getScoreboard());
+		if (!world.isClient() && entity instanceof PlayerEntity playerEntity && Objects.equals(this.getTranslationKey(), "effect.minecraft.saturation")) {
+			SharedHungerComponent hungerComponent = SHARED_HUNGER.get(world.getScoreboard());
+			SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(world.getScoreboard());
 			int hunger = hungerComponent.getHunger();
 			float saturation = saturationComponent.getSaturation();
 			if (playerEntity.getHungerManager().getFoodLevel() == hunger) {
