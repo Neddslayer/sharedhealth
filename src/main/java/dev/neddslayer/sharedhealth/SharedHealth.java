@@ -7,23 +7,34 @@ import dev.neddslayer.sharedhealth.components.SharedSaturationComponent;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.world.GameRules;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.rule.GameRule;
+import net.minecraft.world.rule.GameRuleCategory;
 
 import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.*;
 
 public class SharedHealth implements ModInitializer {
+    public static final String MOD_ID = "sharedhealth";
 
-    public static final GameRules.Key<GameRules.BooleanRule> SYNC_HEALTH =
-            GameRuleRegistry.register("shareHealth", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
-    public static final GameRules.Key<GameRules.BooleanRule> SYNC_HUNGER =
-            GameRuleRegistry.register("shareHunger", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
-    public static final GameRules.Key<GameRules.BooleanRule> LIMIT_HEALTH =
-            GameRuleRegistry.register("limitHealth", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
+    public static final GameRule<Boolean> SYNC_HEALTH = GameRuleBuilder
+        .forBoolean(true)
+        .category(GameRuleCategory.PLAYER)
+        .buildAndRegister(Identifier.of(MOD_ID, "shareHealth"));
+
+    public static final GameRule<Boolean> SYNC_HUNGER = GameRuleBuilder
+        .forBoolean(true)
+        .category(GameRuleCategory.PLAYER)
+        .buildAndRegister(Identifier.of(MOD_ID, "shareHunger"));
+
+    public static final GameRule<Boolean> LIMIT_HEALTH = GameRuleBuilder
+        .forBoolean(true)
+        .category(GameRuleCategory.PLAYER)
+        .buildAndRegister(Identifier.of(MOD_ID, "limitHealth"));
+
     private static boolean lastHealthValue = true;
     private static boolean lastHungerValue = true;
 
@@ -33,26 +44,26 @@ public class SharedHealth implements ModInitializer {
     @Override
     public void onInitialize() {
         ServerTickEvents.END_WORLD_TICK.register((world -> {
-            boolean currentHealthValue = world.getGameRules().getBoolean(SYNC_HEALTH);
-            boolean currentHungerValue = world.getGameRules().getBoolean(SYNC_HUNGER);
-            boolean limitHealthValue = world.getGameRules().getBoolean(LIMIT_HEALTH);
+            boolean currentHealthValue = world.getGameRules().getValue(SYNC_HEALTH);
+            boolean currentHungerValue = world.getGameRules().getValue(SYNC_HUNGER);
+            boolean limitHealthValue = world.getGameRules().getValue(LIMIT_HEALTH);
             if (currentHealthValue != lastHealthValue && currentHealthValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHealth.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
+                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.shareHealth.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
                 lastHealthValue = true;
             }
             else if (currentHealthValue != lastHealthValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHealth.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
+                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.shareHealth.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
                 lastHealthValue = false;
             }
             if (currentHungerValue != lastHungerValue && currentHungerValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHunger.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
+                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.shareHunger.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
                 lastHungerValue = true;
             }
             else if (currentHungerValue != lastHungerValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.shareHunger.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
+                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.shareHunger.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
                 lastHungerValue = false;
             }
-            if (world.getGameRules().getBoolean(SYNC_HEALTH)) {
+            if (world.getGameRules().getValue(SYNC_HEALTH)) {
                 SharedHealthComponent component = SHARED_HEALTH.get(world.getScoreboard());
                 if (component.getHealth() > 20 && limitHealthValue) component.setHealth(20);
                 float finalKnownHealth = component.getHealth();
@@ -70,7 +81,7 @@ public class SharedHealth implements ModInitializer {
                     }
                 });
             }
-            if (world.getGameRules().getBoolean(SYNC_HUNGER)) {
+            if (world.getGameRules().getValue(SYNC_HUNGER)) {
                 SharedHungerComponent component = SHARED_HUNGER.get(world.getScoreboard());
 	            SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(world.getScoreboard());
 	            SharedExhaustionComponent exhaustionComponent = SHARED_EXHAUSTION.get(world.getScoreboard());
