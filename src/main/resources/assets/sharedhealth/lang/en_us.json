@@ -1,12 +1,12 @@
 
 {
-  "gamerule.shareHealth": "Share health across all players",
-  "gamerule.shareHealth.enabled": "Shared health has been enabled!",
-  "gamerule.shareHealth.disabled": "Shared health has been disabled!",
-  "gamerule.shareHunger": "Share hunger across all players",
-  "gamerule.shareHunger.enabled": "Shared hunger has been enabled!",
-  "gamerule.shareHunger.disabled": "Shared hunger has been disabled!",
-  "gamerule.limitHealth": "Limit maximum health to 20",
-  "gamerule.limitHealth.description": "Disable this for compatibility with some mods"
+  "gamerule.sharedhealth.share_health": "Share health across all players",
+  "gamerule.sharedhealth.share_health.enabled": "Shared health has been enabled!",
+  "gamerule.sharedhealth.share_health.disabled": "Shared health has been disabled!",
+  "gamerule.sharedhealth.share_hunger": "Share hunger across all players",
+  "gamerule.sharedhealth.share_hunger.enabled": "Shared hunger has been enabled!",
+  "gamerule.sharedhealth.share_hunger.disabled": "Shared hunger has been disabled!",
+  "gamerule.sharedhealth.limit_health": "Limit maximum health to 20",
+  "gamerule.sharedhealth.limit_health.description": "Disable this for compatibility with some mods"
 }
 
