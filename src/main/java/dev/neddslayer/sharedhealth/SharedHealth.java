@@ -9,100 +9,214 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.rule.GameRule;
 import net.minecraft.world.rule.GameRuleCategory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.*;
 
 public class SharedHealth implements ModInitializer {
+
     public static final GameRule<Boolean> SYNC_HEALTH = GameRuleBuilder
-            .forBoolean(true).category(GameRuleCategory.PLAYER).buildAndRegister(Identifier.of("sharedhealth", "share_health"));
+            .forBoolean(true).category(GameRuleCategory.PLAYER)
+            .buildAndRegister(Identifier.of("sharedhealth", "share_health"));
+
     public static final GameRule<Boolean> SYNC_HUNGER = GameRuleBuilder
-            .forBoolean(true).category(GameRuleCategory.PLAYER).buildAndRegister(Identifier.of("sharedhealth", "share_hunger"));
+            .forBoolean(true).category(GameRuleCategory.PLAYER)
+            .buildAndRegister(Identifier.of("sharedhealth", "share_hunger"));
+
     public static final GameRule<Boolean> LIMIT_HEALTH = GameRuleBuilder
-            .forBoolean(true).category(GameRuleCategory.PLAYER).buildAndRegister(Identifier.of("sharedhealth", "limit_health"));
+            .forBoolean(true).category(GameRuleCategory.PLAYER)
+            .buildAndRegister(Identifier.of("sharedhealth", "limit_health"));
+
+    // New gamerule
+    public static final GameRule<Boolean> SHARED_DAMAGE_ONLY = GameRuleBuilder
+            .forBoolean(false).category(GameRuleCategory.PLAYER)
+            .buildAndRegister(Identifier.of("sharedhealth", "shared_damage_only"));
+
     private static boolean lastHealthValue = true;
     private static boolean lastHungerValue = true;
 
-    /**
-     * Runs the mod initializer.
-     */
+    // Detect health changes
+    private final Map<ServerPlayerEntity, Float> lastHealthMap = new HashMap<>();
+
     @Override
     public void onInitialize() {
-        ServerTickEvents.END_WORLD_TICK.register((world -> {
+
+        ServerTickEvents.END_WORLD_TICK.register(world -> {
+
             boolean currentHealthValue = world.getGameRules().getValue(SYNC_HEALTH);
             boolean currentHungerValue = world.getGameRules().getValue(SYNC_HUNGER);
             boolean limitHealthValue = world.getGameRules().getValue(LIMIT_HEALTH);
+            boolean damageOnly = world.getGameRules().getValue(SHARED_DAMAGE_ONLY);
+
             if (currentHealthValue != lastHealthValue && currentHealthValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.share_health.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
+                world.getServer().getPlayerManager().getPlayerList()
+                        .forEach(player -> player.sendMessageToClient(
+                                Text.translatable("gamerule.sharedhealth.share_health.enabled")
+                                        .formatted(Formatting.GREEN, Formatting.BOLD), false));
                 lastHealthValue = true;
-            }
-            else if (currentHealthValue != lastHealthValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.share_health.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
+            } else if (currentHealthValue != lastHealthValue) {
+                world.getServer().getPlayerManager().getPlayerList()
+                        .forEach(player -> player.sendMessageToClient(
+                                Text.translatable("gamerule.sharedhealth.share_health.disabled")
+                                        .formatted(Formatting.RED, Formatting.BOLD), false));
                 lastHealthValue = false;
             }
+
             if (currentHungerValue != lastHungerValue && currentHungerValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.share_hunger.enabled").formatted(Formatting.GREEN, Formatting.BOLD), false));
+                world.getServer().getPlayerManager().getPlayerList()
+                        .forEach(player -> player.sendMessageToClient(
+                                Text.translatable("gamerule.sharedhealth.share_hunger.enabled")
+                                        .formatted(Formatting.GREEN, Formatting.BOLD), false));
                 lastHungerValue = true;
-            }
-            else if (currentHungerValue != lastHungerValue) {
-                world.getServer().getPlayerManager().getPlayerList().forEach(player -> player.sendMessageToClient(Text.translatable("gamerule.sharedhealth.share_hunger.disabled").formatted(Formatting.RED, Formatting.BOLD), false));
+            } else if (currentHungerValue != lastHungerValue) {
+                world.getServer().getPlayerManager().getPlayerList()
+                        .forEach(player -> player.sendMessageToClient(
+                                Text.translatable("gamerule.sharedhealth.share_hunger.disabled")
+                                        .formatted(Formatting.RED, Formatting.BOLD), false));
                 lastHungerValue = false;
             }
-            if (world.getGameRules().getValue(SYNC_HEALTH)) {
+
+            /*
+             ----------------------------------------
+             Shared Damage Only (Hardcore Co-op Style):
+
+                Damage is shared between all linked players.
+                Healing is NOT shared — each player must heal themselves individually (food, potions, regeneration, etc.).
+                If one player reaches 0 HP, all linked players die.
+                This mode is fully optional and toggleable, so it doesn’t affect the current shared-health behavior.
+             ----------------------------------------
+             */
+            if (damageOnly) {
+
+                for (ServerPlayerEntity player : world.getPlayers()) {
+
+                    float currentHealth = player.getHealth();
+                    float lastHealth = lastHealthMap.getOrDefault(player, currentHealth);
+
+                    if (currentHealth < lastHealth) {
+
+                        float damage = lastHealth - currentHealth;
+
+                        for (ServerPlayerEntity other : world.getPlayers()) {
+
+                            if (other == player) continue;
+
+                            other.damage(world, world.getDamageSources().generic(), damage);
+                        }
+                    }
+
+                    lastHealthMap.put(player, currentHealth);
+
+                    // If one die → everyone will die
+                    if (currentHealth <= 0) {
+                        for (ServerPlayerEntity other : world.getPlayers()) {
+                            other.damage(world, world.getDamageSources().genericKill(), Float.MAX_VALUE);
+                        }
+                    }
+                }
+            }
+
+            /*
+             ----------------------------------------
+             ORIGINAL SHARED HEALTH MODE
+             ----------------------------------------
+             */
+
+            if (!damageOnly && world.getGameRules().getValue(SYNC_HEALTH)) {
+
                 SharedHealthComponent component = SHARED_HEALTH.get(world.getScoreboard());
-                if (component.getHealth() > 20 && limitHealthValue) component.setHealth(20);
+
+                if (component.getHealth() > 20 && limitHealthValue)
+                    component.setHealth(20);
+
                 float finalKnownHealth = component.getHealth();
+
                 world.getPlayers().forEach(playerEntity -> {
                     try {
+
                         float currentHealth = playerEntity.getHealth();
 
                         if (currentHealth > finalKnownHealth) {
-                            playerEntity.damage(world, world.getDamageSources().genericKill(), currentHealth - finalKnownHealth);
+                            playerEntity.damage(world,
+                                    world.getDamageSources().genericKill(),
+                                    currentHealth - finalKnownHealth);
                         } else if (currentHealth < finalKnownHealth) {
                             playerEntity.heal(finalKnownHealth - currentHealth);
                         }
+
                     } catch (Exception e) {
                         System.err.println(e.getMessage());
                     }
                 });
             }
+
+            /*
+             ----------------------------------------
+             SHARED HUNGER
+             ----------------------------------------
+             */
+
             if (world.getGameRules().getValue(SYNC_HUNGER)) {
+
                 SharedHungerComponent component = SHARED_HUNGER.get(world.getScoreboard());
-	            SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(world.getScoreboard());
-	            SharedExhaustionComponent exhaustionComponent = SHARED_EXHAUSTION.get(world.getScoreboard());
-                if (component.getHunger() > 20) component.setHunger(20);
-				if (saturationComponent.getSaturation() > 20) saturationComponent.setSaturation(20.0f);
+                SharedSaturationComponent saturationComponent = SHARED_SATURATION.get(world.getScoreboard());
+                SharedExhaustionComponent exhaustionComponent = SHARED_EXHAUSTION.get(world.getScoreboard());
+
+                if (component.getHunger() > 20)
+                    component.setHunger(20);
+
+                if (saturationComponent.getSaturation() > 20)
+                    saturationComponent.setSaturation(20.0f);
+
                 int finalKnownHunger = component.getHunger();
-				float finalKnownSaturation = saturationComponent.getSaturation();
-				float finalKnownExhaustion = exhaustionComponent.getExhaustion();
+                float finalKnownSaturation = saturationComponent.getSaturation();
+                float finalKnownExhaustion = exhaustionComponent.getExhaustion();
+
                 world.getPlayers().forEach(playerEntity -> {
+
                     try {
+
                         float currentHunger = playerEntity.getHungerManager().getFoodLevel();
-						float currentSaturation = playerEntity.getHungerManager().getSaturationLevel();
-						float currentExhaustion = playerEntity.getHungerManager().exhaustion;
+                        float currentSaturation = playerEntity.getHungerManager().getSaturationLevel();
+                        float currentExhaustion = playerEntity.getHungerManager().exhaustion;
 
                         if (currentHunger != finalKnownHunger) {
                             playerEntity.getHungerManager().setFoodLevel(finalKnownHunger);
                         }
-						if (currentSaturation != finalKnownSaturation) {
-							playerEntity.getHungerManager().setSaturationLevel(finalKnownSaturation);
-						}
-						if (currentExhaustion != finalKnownExhaustion) {
-							playerEntity.getHungerManager().exhaustion = finalKnownExhaustion;
-						}
+
+                        if (currentSaturation != finalKnownSaturation) {
+                            playerEntity.getHungerManager().setSaturationLevel(finalKnownSaturation);
+                        }
+
+                        if (currentExhaustion != finalKnownExhaustion) {
+                            playerEntity.getHungerManager().exhaustion = finalKnownExhaustion;
+                        }
+
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
                 });
             }
-        }));
+        });
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> handler.player.setHealth(SHARED_HEALTH.get(handler.player.getEntityWorld().getScoreboard()).getHealth()));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
+                handler.player.setHealth(
+                        SHARED_HEALTH.get(handler.player.getEntityWorld().getScoreboard()).getHealth()
+                )
+        );
 
-        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> newPlayer.setHealth(SHARED_HEALTH.get(newPlayer.getEntityWorld().getScoreboard()).getHealth()));
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) ->
+                newPlayer.setHealth(
+                        SHARED_HEALTH.get(newPlayer.getEntityWorld().getScoreboard()).getHealth()
+                )
+        );
     }
 }
