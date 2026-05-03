@@ -1,11 +1,9 @@
 package dev.neddslayer.sharedhealth.components;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.scores.Scoreboard;
 
 public class SharedHungerComponent implements IHungerComponent {
 
@@ -30,12 +28,12 @@ public class SharedHungerComponent implements IHungerComponent {
     }
 
     @Override
-    public void readData(ReadView readView) {
-       this.hunger = readView.getInt("Hunger", 20);  // Default to 20 if not present
+    public void readData(ValueInput readView) {
+       this.hunger = readView.getIntOr("Hunger", 20);  // Default to 20 if not present
     }
 
     @Override
-    public void writeData(WriteView writeView) {
+    public void writeData(ValueOutput writeView) {
         writeView.putInt("Hunger", this.hunger);
     }
 }

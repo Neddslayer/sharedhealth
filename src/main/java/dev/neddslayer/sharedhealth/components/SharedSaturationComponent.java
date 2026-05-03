@@ -1,11 +1,9 @@
 package dev.neddslayer.sharedhealth.components;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.scores.Scoreboard;
 
 public class SharedSaturationComponent implements ISaturationComponent {
 	float saturation = 5.0f;
@@ -27,12 +25,12 @@ public class SharedSaturationComponent implements ISaturationComponent {
 	}
 
 	@Override
-	public void readData(ReadView readView) {
-		this.saturation = readView.getFloat("Saturation", 0);
+	public void readData(ValueInput readView) {
+		this.saturation = readView.getFloatOr("Saturation", 5.0f);
 	}
 
 	@Override
-	public void writeData(WriteView writeView) {
+	public void writeData(ValueOutput writeView) {
 		writeView.putFloat("Saturation", this.saturation);
 	}
 }

@@ -1,3 +1,3 @@
-accessWidener v2 named
-mutable field net/minecraft/entity/player/HungerManager exhaustion F
-accessible field net/minecraft/entity/player/HungerManager exhaustion F
+classTweaker  v1  official
+mutable field net/minecraft/world/food/FoodData exhaustionLevel F
+accessible field net/minecraft/world/food/FoodData exhaustionLevel F

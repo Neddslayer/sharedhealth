@@ -25,8 +25,9 @@
   "accessWidener": "sharedhealth.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "fabric": "*",
-    "minecraft": "${minecraft_version}"
+    "minecraft": "~${minecraft_version}",
+    "java": ">=25",
+    "fabric-api": "*"
   },
   "custom": {
     "cardinal-components": [

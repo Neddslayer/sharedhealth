@@ -1,11 +1,9 @@
 package dev.neddslayer.sharedhealth.components;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.scores.Scoreboard;
 
 public class SharedExhaustionComponent implements IExhaustionComponent {
 	float exhaustion = 0.0f;
@@ -28,12 +26,12 @@ public class SharedExhaustionComponent implements IExhaustionComponent {
 	}
 
 	@Override
-	public void readData(ReadView readView) {
-		this.exhaustion = readView.getFloat("Exhaustion", 0.0f);
+	public void readData(ValueInput readView) {
+		this.exhaustion = readView.getFloatOr("Exhaustion", 0.0f);
 	}
 
 	@Override
-	public void writeData(WriteView writeView) {
+	public void writeData(ValueOutput writeView) {
 		writeView.putFloat("Exhaustion", this.exhaustion);
 	}
 }

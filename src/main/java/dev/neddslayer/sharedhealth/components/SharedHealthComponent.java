@@ -1,11 +1,9 @@
 package dev.neddslayer.sharedhealth.components;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.scores.Scoreboard;
 
 public class SharedHealthComponent implements IHealthComponent {
 
@@ -30,12 +28,12 @@ public class SharedHealthComponent implements IHealthComponent {
     }
 
     @Override
-    public void readData(ReadView readView) {
-        this.health = readView.getFloat("playerHealth", 0.0f);  // Default to 0.0f if not present
+    public void readData(ValueInput readView) {
+        this.health = readView.getFloatOr("playerHealth", 20.0f);  // Default to 20.0f if not present
     }
 
     @Override
-    public void writeData(WriteView writeView) {
+    public void writeData(ValueOutput writeView) {
         writeView.putFloat("playerHealth", this.health);
     }
 }

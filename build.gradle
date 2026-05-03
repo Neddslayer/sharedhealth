@@ -1,14 +1,10 @@
 plugins {
-    id 'fabric-loom' version '1.13-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT'
     id 'maven-publish'
 }
 
 version = project.mod_version
 group = project.maven_group
-
-base {
-    archivesName = project.archives_base_name
-}
 
 repositories {
     // Add repositories to retrieve artifacts from in here.
@@ -22,18 +18,21 @@ repositories {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/sharedhealth.accesswidener")
+}
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cc_version}"
+    implementation "org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cc_version}"
     // Adds a dependency on a specific module
-    modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-scoreboard:${project.cc_version}"
+    implementation "org.ladysnake.cardinal-components-api:cardinal-components-scoreboard:${project.cc_version}"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
     include "org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cc_version}"
     include "org.ladysnake.cardinal-components-api:cardinal-components-scoreboard:${project.cc_version}"
@@ -52,12 +51,8 @@ processResources {
     }
 }
 
-loom {
-    accessWidenerPath = file("src/main/resources/sharedhealth.accesswidener")
-}
-
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
@@ -66,20 +61,23 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
+    def projectName = project.name
+    inputs.property "projectName", projectName
+
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
+        rename { "${it}_$projectName"}
     }
 }
 
 // configure the maven publication
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        create("mavenJava", MavenPublication) {
             from components.java
         }
     }

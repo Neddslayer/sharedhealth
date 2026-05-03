@@ -1,12 +1,12 @@
 package dev.neddslayer.sharedhealth.mixin;
 
 import dev.neddslayer.sharedhealth.components.SharedExhaustionComponent;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.HungerManager;
-import net.minecraft.entity.player.PlayerAbilities;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodData;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,24 +16,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static dev.neddslayer.sharedhealth.components.SharedComponentsInitializer.*;
 
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
 
-	@Shadow @Final private PlayerAbilities abilities;
+    @Shadow
+    @Final
+    private Abilities abilities;
 
-	@Shadow protected HungerManager hungerManager;
+    @Shadow
+    protected FoodData foodData;
 
-	protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
+    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, Level world) {
 		super(entityType, world);
 	}
 
-	@Inject(method = "addExhaustion", at = @At("HEAD"))
-	public void syncExhaustion(float exhaustion, CallbackInfo ci) {
+	@Inject(method = "causeFoodExhaustion", at = @At("HEAD"))
+	public void syncExhaustion(float amount, CallbackInfo ci) {
 		if (!this.abilities.invulnerable) {
-			if (!this.getEntityWorld().isClient()) {
-				SharedExhaustionComponent component = SHARED_EXHAUSTION.get(this.getEntityWorld().getScoreboard());
-				if (this.hungerManager.exhaustion == component.getExhaustion()) {
-					component.setExhaustion(Math.min(component.getExhaustion() + exhaustion, 40.0F));
+			if (!this.level().isClientSide()) {
+				SharedExhaustionComponent component = SHARED_EXHAUSTION.get(this.level().getScoreboard());
+				if (this.foodData.exhaustionLevel == component.getExhaustion()) {
+					component.setExhaustion(Math.min(component.getExhaustion() + amount, 40.0F));
 				}
 			}
 

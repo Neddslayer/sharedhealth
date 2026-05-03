@@ -1,17 +1,15 @@
 package dev.neddslayer.sharedhealth.components;
 
+import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
-import net.minecraft.util.Identifier;
 
 
 public class SharedComponentsInitializer implements ScoreboardComponentInitializer {
 
-    public static Identifier id(String path) {
-        return Identifier.of("sharedhealth", path);
-    }
+    public static Identifier id(String path) { return Identifier.fromNamespaceAndPath("sharedhealth", path); }
 
     public static final ComponentKey<SharedHealthComponent> SHARED_HEALTH =
             ComponentRegistry.getOrCreate(id("health"), SharedHealthComponent.class);
